@@ -35,20 +35,24 @@ def menu():
 
 def password_manager():
     data_values = []
+    data_file = []
     data_headings = ['User', 'Pass', 'Description']
     data_values.append([1,2,3])
-    data_values.append([1,2,3])
-    data_cols_width = [5, 8, 35]
+    data_values.append([2,3,4])
+    data_cols_width = [12, 12, 35]
     layout = [
         [sg.Text("PyPass",key="-title-",font=("bold"))],
         [sg.Table(values=data_values, headings=data_headings,
-                            max_col_width=48,
+                            display_row_numbers=True,
+                            selected_row_colors='white on darkgray',
+                            expand_y=True,
+                            max_col_width=59,
                             col_widths=data_cols_width,
                             auto_size_columns=False,
                             justification='left',
                             enable_events=True,
                             num_rows=6,
-                            key='_filestable_')],
+                            key='-table-')],
         [sg.Button("ADD",key="-add-")]
     ]
     window = sg.Window("PyPass",layout)
@@ -58,10 +62,26 @@ def password_manager():
             break
         if event == "-add-":
             user_values = add_user_pass()
-            print(user_values)
             data_values.append(user_values)
-            window["_filestable_"].update(data_values.append(for user_values[i] in range(0,len(user_values)))
+            data_file = []
+            for i in range(0,len(data_values)):
+                data_auth = data_values[i][:]
+                data_auth[1] = "*****"
+                data_file.append(data_auth)
+            print(data_file,"secreto")
+            print(data_values,"no secreto")
+            window["-table-"].update(values=data_file)
             #window.update("")
+        if event == "-table-":
+            try:
+                data_selected = values[event][0]
+                print(data_selected,"aqui")
+                sg.popup("User: ", data_values[data_selected][0],
+                            "Pass: ", data_values[data_selected][1],
+                            "Desc: ", data_values[data_selected][2])
+            except IndexError:
+                pass
+    window.close()
 
 def add_user_pass():
     layout = [
@@ -93,16 +113,16 @@ def add_user_pass():
                 validation = False
             if  validation:
                 print("Validacion")
-                if values["-desc-"] != "":
-                    have_desc = True
-                    break
-                else:
-                    break
+                #if values["-desc-"] != "":
+                #    have_desc = True
+                #    break
+                #else:
+                break
         if event == "-cancel_add_user-":
             break
-    if validation and have_desc:
+    if validation:
         window.close()
-        return values["-user-"],values["-pass1-"],values["-desc-"]
+        return [values["-user-"],values["-pass1-"],values["-desc-"]]
     window.close()
 
 if __name__ == "__main__":
